@@ -3,4 +3,4 @@ project(Minesweeper)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Minesweeper main.cpp)
+add_executable(Minesweeper main.cpp Window.h Window.cpp)
