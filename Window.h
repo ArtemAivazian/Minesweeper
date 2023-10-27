@@ -63,6 +63,10 @@ public:
 
     bool is_Lost() const;
 
+    void refresh_text();
+
+    const std::vector<std::pair<size_t, size_t>>& get_coords() const;
+
 
 private:
     std::ostream &outputStream;
@@ -71,6 +75,7 @@ private:
     char grid[height][width];
     char copy[height][width];
     std::vector<std::pair<size_t, size_t>> coords;
+    std::string text;
     bool once = true;
     bool gLost = false;
 };

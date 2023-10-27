@@ -5,6 +5,24 @@ Window::Window(std::ostream &outputStream) :
     outputStream(outputStream)
     {}
 
+
+void Window::refresh_text() {
+    std::stringstream ss;
+    if (gLost)
+        ss << "You lost!";
+    else {
+        ss << "Entered coords: ";
+        if (!get_coords().empty()) {
+            if (get_coords().back().first)
+                ss << get_coords().back().first << " ";
+            if (get_coords().back().second)
+                ss << get_coords().back().second;
+        }
+    }
+    text = ss.str();
+}
+
+
 void Window::print_grid() {
     std::stringstream buffer;
     buffer << ANSI_CLEAR;
@@ -25,6 +43,7 @@ void Window::print_grid() {
             buffer << "-";
         buffer << std::endl;
     }
+    buffer << "\r" << std::noskipws << text;
     outputStream << buffer.str() << std::endl;
 }
 
@@ -134,7 +153,8 @@ void Window::open_one_cell_around(std::pair<size_t, size_t> &point) {
             if (newX >= 0 &&
                 newX < width &&
                 newY >= 0 &&
-                newY < height) {
+                newY < height &&
+                grid[newY][newX] != 'X') {
                 copy[newY][newX] = grid[newY][newX];
             }
         }
@@ -147,6 +167,10 @@ void Window::open_number(std::pair<size_t, size_t>& point) {
 
 bool Window::is_Lost() const {
     return gLost;
+}
+
+const std::vector<std::pair<size_t, size_t>> &Window::get_coords() const {
+    return coords;
 }
 
 
