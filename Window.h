@@ -4,15 +4,13 @@
 #include <sstream>
 #include <utility>
 
-#define ANSI_CLEAR "\x1B[2J\x1B[H"  // mazani terminalu
+#define ANSI_CLEAR "\x1B[2J\x1B[H"  //clear terminal
+#define COLOR_RED   "\x1B[91m"
+#define COLOR_GREEN "\x1B[92m"
+#define COLOR_BLUE "\x1B[34m"
+#define COLOR_PURPLE "\x1B[35m"
+#define ANSI_COLOR_RESET "\x1B[m"  //reset colors
 
-enum field_param {
-    nothing,
-    covered,
-    bomb,
-    flag,
-    number
-};
 
 class Window {
 public:
@@ -62,10 +60,31 @@ public:
     void original_grid();
 
     bool is_Lost() const;
+    void set_lost(bool lost);
 
     void refresh_text();
 
     const std::vector<std::pair<size_t, size_t>>& get_coords() const;
+    void init_copy_grid();
+
+    bool isFlagMode() const;
+
+    void setFlagMode(bool flagMode);
+
+    void add_marked_coordinates(size_t coord1, size_t coord2);
+
+
+    bool isGWin() const;
+
+    void setGWin(bool gWin);
+
+    int getCount() const;
+
+    void setCount(int count);
+
+    const std::vector<std::pair<size_t, size_t>> &get_marked_coords() const;
+
+    bool is_visited(std::pair<size_t, size_t> point);
 
 
 private:
@@ -75,9 +94,15 @@ private:
     char grid[height][width];
     char copy[height][width];
     std::vector<std::pair<size_t, size_t>> coords;
+    std::vector<std::pair<size_t, size_t>> marked_coords;
     std::string text;
     bool once = true;
     bool gLost = false;
+    bool gWin = false;
+    bool flag_mode = false;
+    int count = 0;
+    int bomb_count = 8;
+    std::vector<std::pair<size_t, size_t>> visited;
 };
 
 
