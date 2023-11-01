@@ -19,8 +19,7 @@ void set_raw(bool set) {
 
 class Game {
 public:
-    explicit Game() :
-            quit(false)
+    explicit Game() : quit(false)
     {
         win = std::make_unique<Window>(std::cout);
     }
@@ -42,67 +41,15 @@ public:
             once = false;
             cvar.notify_one();
         }
-        if (win->isFlagMode()) {
-            char c;
-            std::cin >> c;
-            if (c == 'q') {
-                set_quit(true);
-                cvar.notify_one();
-            } else if (c == 'f'){
-                win->setFlagMode(false);
-                cvar.notify_one();
-            } else if (c >= '1' && std::cin.peek() == ' ') {
-                int digit1 = c - '0';
-                int digit2;
-                std::cin >> digit2;
-
-                win->add_marked_coordinates(digit1, digit2);
-                win->calculate_grid();
-
-                if (is_Win()) {
-                    set_quit(true);
-                }
-                cvar.notify_one();
-            }
-        }
         char c;
         std::cin >> c;
-        if (c == 'q') {
-            set_quit(true);
-            cvar.notify_one();
-        } else if (c == 'f'){
-            win->setFlagMode(true);
-            cvar.notify_one();
-        } else if (c >= '1' && std::cin.peek() == ' ') {
-            int digit1 = c - '0';
-            int digit2;
-            std::cin >> digit2;
-
-            win->add_coordinates(digit1, digit2);
-            win->calculate_grid();
-
-            if (is_Lost()) {
-                set_quit(true);
-            }
-            cvar.notify_one();
-        }
+        handle_input(c);
+        cvar.notify_one();
 
     }
 
-//    void compute() {
-//        std::this_thread::sleep_for(std::chrono::milliseconds(300));
-//        std::unique_lock<std::mutex> ul(mutex);
-////        mutex.lock();
-//
-//        win->calculate_grid();
-//
-//        std::cout << "Compute" << std::endl;
-//
-//        cvar.notify_one();
-//    } //unlock
 
     void output() {
-//        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         std::unique_lock<std::mutex> ul(mutex);
         cvar.wait(ul);
 
@@ -130,17 +77,35 @@ private:
     std::mutex mutex;
     std::condition_variable cvar;
     bool once = true;
+
+    void handle_input(char c) {
+        if (c == 'q') {
+            set_quit(true);
+        } else if (c == 'f' && win->isFlagMode()) {
+            win->setFlagMode(false);
+        } else if (c == 'f' && !win->isFlagMode()){
+            win->setFlagMode(true);
+        }else if (c >= '1' && std::cin.peek() == ' ') {
+            int digit1 = c - '0';
+            int digit2;
+            std::cin >> digit2;
+            if (win->isFlagMode()) {
+                win->calculate_marked_coordinates(digit1, digit2);
+                if (is_Win()) {
+                    set_quit(true);
+                }
+            } else {
+                win->add_coordinates(digit1, digit2);
+                win->calculate_grid(digit1, digit2);
+                if (is_Lost()) {
+                    set_quit(true);
+                }
+            }
+        }
+    }
 };
 
 int main() {
-//    auto computeThread = [](Game& g) {
-//        while (true) {
-//            g.compute();
-//            if (g.is_Lost() || g.get_quit()) {
-//                break;
-//            }
-//        }
-//    };
     auto outputThread = [](Game& g) {
         while (true) {
             g.output();
@@ -162,14 +127,11 @@ int main() {
 
     set_raw(true);
     Game game;
-//    std::thread t1(computeThread, std::ref(game));
-    std::thread t3(inputThread, std::ref(game));
+    std::thread t1(inputThread, std::ref(game));
     std::thread t2(outputThread, std::ref(game));
 
-
-//    t1.join();
+    t1.join();
     t2.join();
-    t3.join();
     set_raw(false);
 
     return 0;

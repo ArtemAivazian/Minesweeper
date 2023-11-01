@@ -19,7 +19,6 @@ public:
      */
     explicit Window(std::ostream &outputStream);
 
-
     /*
      *  print grid
      */
@@ -28,7 +27,7 @@ public:
     /*
      *  calculate grid
      */
-    void calculate_grid();
+    void calculate_grid(int y, int x);
 
     /*
      * calculate count of bombs near cell
@@ -51,11 +50,15 @@ public:
     void open_number(std::pair<size_t, size_t>& point);
 
     /*
-     *
+     * opens one cell in each direction around cell that is empty and is being clicked in non-flag mode
      */
     void open_one_cell_around(std::pair<size_t, size_t>& point);
 
+    /*
+     * add coords of entered points in non-flag mode
+     */
     void add_coordinates(size_t coord1, size_t coord2);
+    bool already_entered(std::pair<size_t, size_t>& point);
 
     void original_grid();
 
@@ -71,20 +74,19 @@ public:
 
     void setFlagMode(bool flagMode);
 
-    void add_marked_coordinates(size_t coord1, size_t coord2);
+    void calculate_marked_coordinates(size_t coord1, size_t coord2);
 
 
     bool isGWin() const;
 
-    void setGWin(bool gWin);
-
-    int getCount() const;
-
-    void setCount(int count);
 
     const std::vector<std::pair<size_t, size_t>> &get_marked_coords() const;
 
     bool is_visited(std::pair<size_t, size_t> point);
+
+    bool already_marked(std::pair<size_t, size_t>& point);
+
+    void remove_flag(std::pair<size_t, size_t>& point);
 
 
 private:
@@ -96,13 +98,15 @@ private:
     std::vector<std::pair<size_t, size_t>> coords;
     std::vector<std::pair<size_t, size_t>> marked_coords;
     std::string text;
-    bool once = true;
     bool gLost = false;
     bool gWin = false;
     bool flag_mode = false;
     int count = 0;
     int bomb_count = 8;
     std::vector<std::pair<size_t, size_t>> visited;
+    //Timer
+    std::chrono::time_point<std::chrono::steady_clock> start, end;
+    std::chrono::duration<float> duration;
 };
 
 
