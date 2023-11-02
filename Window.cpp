@@ -254,7 +254,7 @@ bool Window::is_visited(std::pair<size_t, size_t> point) {
 }
 
 void Window::open_number(std::pair<size_t, size_t>& point) {
-    copy[point.first - 1][point.second - 1] = grid[point.first - 1][point.second - 1];
+    copy[point.first][point.second] = grid[point.first][point.second];
 }
 
 bool Window::is_Lost() const {
