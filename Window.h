@@ -4,6 +4,9 @@
 #include <sstream>
 #include <utility>
 #include <algorithm>
+//save data
+#include <fstream>
+#include "json.hpp"
 
 #define ANSI_CLEAR "\x1B[2J\x1B[H"  //clear terminal
 #define COLOR_RED   "\x1B[91m"
@@ -12,6 +15,7 @@
 #define COLOR_PURPLE "\x1B[35m"
 #define ANSI_COLOR_RESET "\x1B[m"  //reset colors
 
+using json = nlohmann::json;
 
 class Window {
 public:
@@ -21,12 +25,14 @@ public:
     explicit Window(std::ostream &outputStream);
     /*
      *  print displayed grid to console
+     *  is loaded - if it is false, will be printed init text
      */
-    void print_grid();
+    void print_grid(bool& is_loaded);
     /*
      * update text under the displayed grid
+     * is loaded - if it is false, will be calculated init text
      */
-    void refresh_text();
+    void refresh_text(bool& is_loaded);
     /*
      *  compute entered coords and update
      */
@@ -50,7 +56,15 @@ public:
      * initialize displayed grid with '0'
      */
     void init_copy_grid();
+    /*
+     * save to JSON file both grids: original and displayed
+     */
+    void save_game(const std::string& file_name);
 
+    /*
+     * load grids data from json file "grids.json"
+     */
+    void load_json();
     //getters and setters
 
     const std::vector<std::pair<size_t, size_t>>& get_coords() const;
@@ -81,8 +95,8 @@ private:
     int count = 0; //count of correct marked flags
     std::vector<std::pair<size_t, size_t>> visited; //vector of points that has already opened
     //Timer
-    std::chrono::time_point<std::chrono::steady_clock> start, end;
-    std::chrono::duration<float> duration;
+//    std::chrono::time_point<std::chrono::steady_clock> start, end;
+//    std::chrono::duration<float> duration;
 
 
     //private methods
@@ -123,8 +137,6 @@ private:
      * opens one cell in each direction around cell that is empty and is being clicked in non-flag mode
      */
     void open_one_cell_around(std::pair<size_t, size_t>& point);
-
-
 };
 
 

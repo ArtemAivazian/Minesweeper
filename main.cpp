@@ -8,6 +8,9 @@
 #include <cstdlib>
 #include <vector>
 #include <future>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 void set_raw(bool set) {
     if (set) {
@@ -24,11 +27,27 @@ public:
         win = std::make_unique<Window>(std::cout);
     }
 
-    void init() {
+    void load_game() {
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         std::unique_lock<std::mutex> lg(mutex);
-        win->original_grid();
-        win->init_copy_grid();
+
+        if (fs::exists("grids.json")) {
+            cvar.notify_one();
+            cvar.wait(lg);
+            if (is_loaded)
+                win->load_json();
+            else {
+                is_loaded = true;
+                //delete "grids.json"
+                fs::remove("grids.json");
+                win->original_grid();
+                win->init_copy_grid();
+            }
+        } else {
+            is_loaded = true;
+            win->original_grid();
+            win->init_copy_grid();
+        }
         cvar.notify_one();
     }
 
@@ -38,16 +57,17 @@ public:
 
         if (quit)
             return;
-        if (win->is_lost())
+        if (win->is_lost()) {
             return;
-        if (win->is_game_won())
+        }
+        if (win->is_game_won()) {
             return;
+        }
 
         char c;
         std::cin >> c;
         handle_input(c);
         cvar.notify_one();
-
     }
 
 
@@ -55,8 +75,8 @@ public:
         std::unique_lock<std::mutex> ul(mutex);
         cvar.wait(ul);
 
-        win->refresh_text();
-        win->print_grid();
+        win->refresh_text(is_loaded);
+        win->print_grid(is_loaded);
     }
 
     bool is_Lost(){
@@ -75,12 +95,19 @@ public:
     }
 private:
     bool quit;
+    bool is_loaded = false;
     std::unique_ptr<Window> win;
     std::mutex mutex;
     std::condition_variable cvar;
 
     void handle_input(char c) {
-        if (c == 'q') {
+        if (c == 'y') {
+            is_loaded = true;
+        } else if (c == 'n') {
+            is_loaded = false;
+        } else if (c == 'q') {
+            //save game
+            win->save_game("grids.json");
             set_quit(true);
         } else if (c == 'f' && win->is_flag_mode()) {
             win->set_flag_mode(false);
@@ -93,12 +120,16 @@ private:
             if (win->is_flag_mode()) {
                 win->calculate_marked_coordinates(digit1, digit2);
                 if (is_Win()) {
+                    if (fs::exists("grids.json"))
+                        fs::remove("grids.json");
                     set_quit(true);
                 }
             } else {
                 win->add_coordinates(digit1, digit2);
                 win->calculate_grid(digit1, digit2);
                 if (is_Lost()) {
+                    if (fs::exists("grids.json"))
+                        fs::remove("grids.json");
                     set_quit(true);
                 }
             }
@@ -109,13 +140,13 @@ private:
 int main() {
 
     auto initThread = [](Game& g) {
-        g.init();
+        g.load_game();
     };
 
     auto outputThread = [](Game& g) {
         while (true) {
             g.output();
-            if (g.is_Lost() || g.get_quit()) {
+            if (g.get_quit()) {
                 break;
             }
         }
@@ -124,7 +155,7 @@ int main() {
     auto inputThread = [](Game& g) {
         while (true) {
             g.input();
-            if (g.get_quit() || g.is_Lost()) {
+            if (g.get_quit()) {
                 break;
             }
         }

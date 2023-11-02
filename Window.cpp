@@ -2,69 +2,87 @@
 
 
 Window::Window(std::ostream &outputStream) :
-        output_stream(outputStream),
-        start(std::chrono::high_resolution_clock::now())
+        output_stream(outputStream)
+//        start(std::chrono::high_resolution_clock::now())
     {}
 
-void Window::refresh_text() {
+void Window::refresh_text(bool& is_loaded) {
     std::stringstream ss;
-    if (victory) {
-        end = std::chrono::high_resolution_clock::now();
-        duration = end - start;
-        ss << "You won! Your time: " << duration.count();
-    } else if (flag_mode) {
-        ss << "You are in flag mode!" << " ";
-        ss << "Entered coords in flag mode: ";
-        if (!get_marked_coords().empty()) {
-            if (get_marked_coords().back().first)
-                ss << get_marked_coords().back().first << " ";
-            if (get_marked_coords().back().second)
-                ss << get_marked_coords().back().second;
-        }
-    } else if (defeat) {
-        end = std::chrono::high_resolution_clock::now();
-        duration = end - start;
-        ss << "You lost! Your time: " << duration.count();
+    if (!is_loaded) {
+        ss << "You have saved progress. Do you want to continue? y/n: ";
     } else {
-        ss << "Entered coords: ";
-        if (!get_coords().empty()) {
-            if (get_coords().back().first)
-                ss << get_coords().back().first << " ";
-            if (get_coords().back().second)
-                ss << get_coords().back().second;
+            if (victory) {
+//        end = std::chrono::high_resolution_clock::now();
+//        duration = end - start;
+//        ss << "You won! Your time: " << duration.count();
+                ss << "You won!";
+            } else if (flag_mode) {
+                ss << "You are in flag mode!" << " ";
+                ss << "Entered coords in flag mode: ";
+                if (!get_marked_coords().empty()) {
+                    if (get_marked_coords().back().first)
+                        ss << get_marked_coords().back().first << " ";
+                    if (get_marked_coords().back().second)
+                        ss << get_marked_coords().back().second;
+                }
+            } else if (defeat) {
+//        end = std::chrono::high_resolution_clock::now();
+//        duration = end - start;
+//        ss << "You lost! Your time: " << duration.count();
+                ss << "You lost!";
+            } else {
+                ss << "Entered coords: ";
+                if (!get_coords().empty()) {
+                    if (get_coords().back().first)
+                        ss << get_coords().back().first << " ";
+                    if (get_coords().back().second)
+                        ss << get_coords().back().second;
+                }
+            }
         }
-    }
     text = ss.str();
 }
 
 
-void Window::print_grid() {
+void Window::print_grid(bool& is_loaded) {
     std::stringstream buffer;
-    buffer << ANSI_CLEAR << ANSI_COLOR_RESET;
-    buffer << "\r";
-    for (size_t i = 0; i < 4 * width + 1; ++i)
-        buffer << "-";
-    buffer << std::endl;
-    for (size_t j = 0; j < height; ++j) {
+    if (is_loaded) {
+        buffer << ANSI_CLEAR << ANSI_COLOR_RESET;
         buffer << "\r";
-        for (size_t i = 0; i < width; ++i) {
-            buffer << "| ";
-            switch (copy[j][i]) {
-                case '1': buffer << COLOR_BLUE << copy[j][i] << ANSI_COLOR_RESET; break;
-                case '2': buffer << COLOR_GREEN << copy[j][i] << ANSI_COLOR_RESET; break;
-                case '3': buffer << COLOR_RED << copy[j][i] << ANSI_COLOR_RESET; break;
-                case '4': buffer << COLOR_PURPLE << copy[j][i] << ANSI_COLOR_RESET; break;
-                default: buffer << copy[j][i]; break;
-            }
-            buffer << " ";
-        }
-        buffer << "|";
-//        if (j == height / 2)
-//            buffer << timer;
-        buffer << "\n\r";
         for (size_t i = 0; i < 4 * width + 1; ++i)
             buffer << "-";
         buffer << std::endl;
+        for (size_t j = 0; j < height; ++j) {
+            buffer << "\r";
+            for (size_t i = 0; i < width; ++i) {
+                buffer << "| ";
+                switch (copy[j][i]) {
+                    case '1':
+                        buffer << COLOR_BLUE << copy[j][i] << ANSI_COLOR_RESET;
+                        break;
+                    case '2':
+                        buffer << COLOR_GREEN << copy[j][i] << ANSI_COLOR_RESET;
+                        break;
+                    case '3':
+                        buffer << COLOR_RED << copy[j][i] << ANSI_COLOR_RESET;
+                        break;
+                    case '4':
+                        buffer << COLOR_PURPLE << copy[j][i] << ANSI_COLOR_RESET;
+                        break;
+                    default:
+                        buffer << copy[j][i];
+                        break;
+                }
+                buffer << " ";
+            }
+            buffer << "|";
+//        if (j == height / 2)
+//            buffer << timer;
+            buffer << "\n\r";
+            for (size_t i = 0; i < 4 * width + 1; ++i)
+                buffer << "-";
+            buffer << std::endl;
+        }
     }
     buffer << "\r" << std::noskipws << text;
     output_stream << buffer.str() << std::endl;
@@ -276,6 +294,67 @@ bool Window::is_game_won() const {
 
 const std::vector<std::pair<size_t, size_t>> &Window::get_marked_coords() const {
     return marked_coords;
+}
+
+void Window::save_game(const std::string& file_name) {
+    // Create a JSON object to hold the arrays
+    json data;
+
+    // Add the original grid to the JSON object
+    json grid_data;
+    for (int i = 0; i < height; ++i) {
+        json row;
+        for (int j = 0; j < width; ++j) {
+            row.push_back(grid[i][j]);
+        }
+        grid_data.push_back(row);
+    }
+    data["grid"] = grid_data;
+
+    // Add the displayed grid to the JSON object
+    json copy_data;
+    for (int i = 0; i < height; ++i) {
+        json row;
+        for (int j = 0; j < width; ++j) {
+            row.push_back(copy[i][j]);
+        }
+        copy_data.push_back(row);
+    }
+    data["copy"] = copy_data;
+
+    // Save the JSON object to a JSON file and if it exists, it will be overriden
+    std::ofstream file(file_name, std::ios::out);
+    file << data.dump(4); // The "4" is for pretty-printing
+    file.close();
+}
+
+void Window::load_json() {
+    std::ifstream file("grids.json");
+    json jsonData;
+
+    if (file.is_open()) {
+        file >> jsonData;
+        file.close();
+    } else {
+//                std::cerr << "Failed to open the JSON file." << std::endl;
+        return;
+    }
+
+    //get original grid
+    json grid_json = jsonData["grid"];
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            grid[i][j] = static_cast<char>(grid_json[i][j].get<size_t>());
+        }
+    }
+
+    //get displayed grid
+    json copy_json = jsonData["copy"];
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            copy[i][j] = static_cast<char>(copy_json[i][j].get<size_t>());
+        }
+    }
 }
 
 
