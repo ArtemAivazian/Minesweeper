@@ -3,6 +3,7 @@
 #include <random>
 #include <sstream>
 #include <utility>
+#include <algorithm>
 
 #define ANSI_CLEAR "\x1B[2J\x1B[H"  //clear terminal
 #define COLOR_RED   "\x1B[91m"
@@ -18,95 +19,112 @@ public:
      * window constructor
      */
     explicit Window(std::ostream &outputStream);
-
     /*
-     *  print grid
+     *  print displayed grid to console
      */
     void print_grid();
-
     /*
-     *  calculate grid
+     * update text under the displayed grid
+     */
+    void refresh_text();
+    /*
+     *  compute entered coords and update
      */
     void calculate_grid(int y, int x);
-
     /*
-     * calculate count of bombs near cell
+     * add coords of entered points in non-flag mode
+     */
+    void add_coordinates(size_t coord1, size_t coord2);
+    /*
+     * add marked point to vector or delete it, if it has been already marked
+     */
+    void calculate_marked_coordinates(size_t coord1, size_t coord2);
+    /*
+     * Initialize original grid:
+     * 1. initialize each cell with '0'
+     * 2. generate bombs randomly
+     * 3. calculate count of bombs around the particular cell
+     */
+    void original_grid();
+    /*
+     * initialize displayed grid with '0'
+     */
+    void init_copy_grid();
+
+    //getters and setters
+
+    const std::vector<std::pair<size_t, size_t>>& get_coords() const;
+
+    const std::vector<std::pair<size_t, size_t>>& get_marked_coords() const;
+
+    bool is_flag_mode() const;
+
+    void set_flag_mode(bool mode);
+
+    bool is_game_won() const;
+
+    bool is_lost() const;
+
+private:
+    std::ostream &output_stream; //Output current reference (std::cout)
+    static const int width = 9; //Default grid width
+    static const int height = 9; //Default grid height
+    int bomb_count = 8;//Max count of bombs that can be on the grid
+    char grid[height][width]; //Original grid
+    char copy[height][width]; //Displayed grid
+    std::vector<std::pair<size_t, size_t>> coords; //vector of points, that was entered in non-flag mode
+    std::vector<std::pair<size_t, size_t>> marked_coords; //vector of points, that was entered in flag mode
+    std::string text; //displayed info text under the displayed grid
+    bool defeat = false; //a flag that determines whether a player has lost
+    bool victory = false; //a flag that determines whether a player has won
+    bool flag_mode = false; //a flag that determines whether a player in a flag mode
+    int count = 0; //count of correct marked flags
+    std::vector<std::pair<size_t, size_t>> visited; //vector of points that has already opened
+    //Timer
+    std::chrono::time_point<std::chrono::steady_clock> start, end;
+    std::chrono::duration<float> duration;
+
+
+    //private methods
+
+    //returns true, if point already visited
+    bool is_visited(std::pair<size_t, size_t> point);
+    /*
+     * determines, if the entered marked point has already been marked
+     * return true, if point has already been marked
+     */
+    bool already_marked(std::pair<size_t, size_t>& point);
+    /*
+     * removes flag from the cell
+     */
+    void remove_flag(std::pair<size_t, size_t>& point);
+    /*
+     * determines, if the entered point has already been entered
+     * returns true, if the point has already been entered
+     */
+    bool already_entered(std::pair<size_t, size_t>& point);
+    /*
+     * calculate count of bombs around the particular cell
      */
     void calculate_bombs_near();
-
     /*
-     * initialize grid
+     * initialize each cell with '0' of original grid
      */
     void init_grid();
-
     /*
-     * initialize bombs
+     * initialize bombs on original grid
      */
     void init_bombs();
-
     /*
-     * show grid with coordinate selected
+     * show grid with selected point
      */
     void open_number(std::pair<size_t, size_t>& point);
-
     /*
      * opens one cell in each direction around cell that is empty and is being clicked in non-flag mode
      */
     void open_one_cell_around(std::pair<size_t, size_t>& point);
 
-    /*
-     * add coords of entered points in non-flag mode
-     */
-    void add_coordinates(size_t coord1, size_t coord2);
-    bool already_entered(std::pair<size_t, size_t>& point);
 
-    void original_grid();
-
-    bool is_Lost() const;
-    void set_lost(bool lost);
-
-    void refresh_text();
-
-    const std::vector<std::pair<size_t, size_t>>& get_coords() const;
-    void init_copy_grid();
-
-    bool isFlagMode() const;
-
-    void setFlagMode(bool flagMode);
-
-    void calculate_marked_coordinates(size_t coord1, size_t coord2);
-
-
-    bool isGWin() const;
-
-
-    const std::vector<std::pair<size_t, size_t>> &get_marked_coords() const;
-
-    bool is_visited(std::pair<size_t, size_t> point);
-
-    bool already_marked(std::pair<size_t, size_t>& point);
-
-    void remove_flag(std::pair<size_t, size_t>& point);
-
-
-private:
-    std::ostream &outputStream;
-    static const int width = 9;
-    static const int height = 9;
-    char grid[height][width];
-    char copy[height][width];
-    std::vector<std::pair<size_t, size_t>> coords;
-    std::vector<std::pair<size_t, size_t>> marked_coords;
-    std::string text;
-    bool gLost = false;
-    bool gWin = false;
-    bool flag_mode = false;
-    int count = 0;
-    int bomb_count = 8;
-    std::vector<std::pair<size_t, size_t>> visited;
-    //Timer
-    std::chrono::time_point<std::chrono::steady_clock> start, end;
-    std::chrono::duration<float> duration;
 };
 
 

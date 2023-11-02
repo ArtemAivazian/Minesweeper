@@ -1,17 +1,16 @@
 #include "Window.h"
-#include <algorithm>
 
 
 Window::Window(std::ostream &outputStream) :
-    outputStream(outputStream),
-    start(std::chrono::high_resolution_clock::now())
+        output_stream(outputStream),
+        start(std::chrono::high_resolution_clock::now())
     {}
 
 
 
 void Window::refresh_text() {
     std::stringstream ss;
-    if (gWin) {
+    if (victory) {
         end = std::chrono::high_resolution_clock::now();
         duration = end - start;
         ss << "You won! Your time: " << duration.count();
@@ -24,7 +23,7 @@ void Window::refresh_text() {
             if (get_marked_coords().back().second)
                 ss << get_marked_coords().back().second;
         }
-    } else if (gLost) {
+    } else if (defeat) {
         end = std::chrono::high_resolution_clock::now();
         duration = end - start;
         ss << "You lost! Your time: " << duration.count();
@@ -70,7 +69,7 @@ void Window::print_grid() {
         buffer << std::endl;
     }
     buffer << "\r" << std::noskipws << text;
-    outputStream << buffer.str() << std::endl;
+    output_stream << buffer.str() << std::endl;
 }
 
 void Window::init_grid() {
@@ -171,7 +170,7 @@ void Window::calculate_grid(int y, int x) {
             break;
         case 'X':
             //lost the game
-            gLost = true;
+            defeat = true;
             break;
         default:
             open_number(point);
@@ -209,7 +208,7 @@ void Window::calculate_marked_coordinates(size_t coord1, size_t coord2) {
                 count++;
             }
             if (count == bomb_count) {
-                gWin = true;
+                victory = true;
             }
             marked_coords.push_back(marked_coord_pair);
             copy[coord1 - 1][coord2 - 1] = 'F';
@@ -257,24 +256,25 @@ void Window::open_number(std::pair<size_t, size_t>& point) {
     copy[point.first][point.second] = grid[point.first][point.second];
 }
 
-bool Window::is_Lost() const {
-    return gLost;
+bool Window::is_lost() const {
+    return defeat;
 }
 
 const std::vector<std::pair<size_t, size_t>> &Window::get_coords() const {
     return coords;
 }
 
-bool Window::isFlagMode() const {
+bool Window::is_flag_mode() const {
     return flag_mode;
 }
 
-void Window::setFlagMode(bool flagMode) {
-    flag_mode = flagMode;
+void Window::set_flag_mode(bool mode) {
+    flag_mode = mode;
 }
 
-bool Window::isGWin() const {
-    return gWin;
+
+bool Window::is_game_won() const {
+    return victory;
 }
 
 const std::vector<std::pair<size_t, size_t>> &Window::get_marked_coords() const {
