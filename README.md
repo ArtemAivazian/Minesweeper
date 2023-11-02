@@ -1,8 +1,8 @@
 # Minesweeper
 
 ## Zadání
-Implementujte hru Minessweeper s dálší funkcionalitou.
-Hráč bude postupně zadávat součadnice umístění značky buď v režimu praporu pro oznacení bomb, 
+Implementujte hru Minesweeper s dálší funkcionalitou:
+hráč bude postupně zadávat součadnice umístění značky buď v režimu praporu pro oznacení bomb, 
 nebo v normalním režimu pro otevření vybráných buněk.
 Program automaticky vyhodnotí výsledek hry a tyto imformace zobrazí na terminál.
 
@@ -12,10 +12,6 @@ Program lze zkompilovat následujícím příkazem:
 g++ -std=c++17 main.cpp Window.cpp -o main -lpthread
 ```
 
-## Spuštění a přepínače
-Hra se spouští z příkazové řádky.
-TO-DO
-
 Příklady spuštění programu:
 ```bash
 ./main
@@ -24,14 +20,23 @@ Příklady spuštění programu:
 ## Ovládání programu
 Pod hrací plochou je vypsáno, jaké souradnice zvolil hráč.
 
+### Změna režimu
+Změnu režimu lze provest smačknutím klavesy `f`.
+Následně hráč zadává souřadnice jako v normalním režimu.
+
 ### Zadávání souřadnic
-Souřadnice zadáváme jako dvojici `[řádek, sloupec]`. Řádky i sloupce jsou číslovány od 1.
+Souřadnice zadáváme jako dvojici `řádek` MEZERA `sloupec` . Řádky i sloupce jsou číslovány od 1.
+Pokud hráč chce odebrat prapor z buňky, musí zadat souřadnice teto buňky a prapor se vymaže.
 
 ### Ukončení programu
-Program je ukončí automaticky, pokud hráč správně označí všechny bomby praporem. Hra končí i tehdy, pokud hráč zvolí souřadnice, 
-které odpovidají bombě, totiž prohraje.
+Program je ukončí automaticky, pokud hráč správně označí všechny bomby praporem:
+`You won!`
 
-Program je možné kdykoliv ukončit klávesou `Q`.
+Hra končí i tehdy, pokud hráč zvolí souřadnice, 
+které odpovidají bombě, totiž prohraje.
+`You lost!`
+
+Program je možné kdykoliv ukončit klávesou `q`.
 
 ## Testování programu
 TO-DO

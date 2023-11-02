@@ -6,8 +6,6 @@ Window::Window(std::ostream &outputStream) :
         start(std::chrono::high_resolution_clock::now())
     {}
 
-
-
 void Window::refresh_text() {
     std::stringstream ss;
     if (victory) {
@@ -271,7 +269,6 @@ bool Window::is_flag_mode() const {
 void Window::set_flag_mode(bool mode) {
     flag_mode = mode;
 }
-
 
 bool Window::is_game_won() const {
     return victory;
