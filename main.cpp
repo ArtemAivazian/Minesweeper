@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "window.hpp"
 
 #include <iostream>
 #include <utility>
@@ -10,6 +10,10 @@
 #include <future>
 #include <filesystem>
 
+/*
+ * is used to check if files already exists or not;
+ * removes files when the game is lost or won
+ */
 namespace fs = std::filesystem;
 
 void set_raw(bool set) {
@@ -24,22 +28,23 @@ class Game {
 public:
     explicit Game() : quit(false)
     {
-        win = std::make_unique<Window>(std::cout);
+        win = std::make_unique<window>(std::cout);
     }
 
     void load_game() {
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         std::unique_lock<std::mutex> lg(mutex);
 
-        if (fs::exists("grids.json")) {
+        if (fs::exists("grid.txt") && fs::exists("copy.txt")) {
             cvar.notify_one();
             cvar.wait(lg);
             if (is_loaded)
-                win->load_json();
+                win->load_txt();
             else {
                 is_loaded = true;
-                //delete "grids.json"
-                fs::remove("grids.json");
+                //delete files
+                fs::remove("grid.txt");
+                fs::remove("copy.txt");
                 win->original_grid();
                 win->init_copy_grid();
             }
@@ -96,18 +101,20 @@ public:
 private:
     bool quit;
     bool is_loaded = false;
-    std::unique_ptr<Window> win;
+    std::unique_ptr<window> win;
     std::mutex mutex;
     std::condition_variable cvar;
 
     void handle_input(char c) {
-        if (c == 'y') {
+        if (c == 's'){
+            //save game
+            win->save_grid("grid.txt");
+            win->save_copy("copy.txt");
+        } else if (c == 'y') {
             is_loaded = true;
         } else if (c == 'n') {
             is_loaded = false;
         } else if (c == 'q') {
-            //save game
-            win->save_game("grids.json");
             set_quit(true);
         } else if (c == 'f' && win->is_flag_mode()) {
             win->set_flag_mode(false);
@@ -120,16 +127,20 @@ private:
             if (win->is_flag_mode()) {
                 win->calculate_marked_coordinates(digit1, digit2);
                 if (is_Win()) {
-                    if (fs::exists("grids.json"))
-                        fs::remove("grids.json");
+                    if (fs::exists("grid.txt") && fs::exists("copy.txt")) {
+                        fs::remove("grid.txt");
+                        fs::remove("copy.txt");
+                    }
                     set_quit(true);
                 }
             } else {
                 win->add_coordinates(digit1, digit2);
                 win->calculate_grid(digit1, digit2);
                 if (is_Lost()) {
-                    if (fs::exists("grids.json"))
-                        fs::remove("grids.json");
+                    if (fs::exists("grid.txt") && fs::exists("copy.txt")) {
+                        fs::remove("grid.txt");
+                        fs::remove("copy.txt");
+                    }
                     set_quit(true);
                 }
             }

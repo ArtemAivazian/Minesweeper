@@ -6,7 +6,6 @@
 #include <algorithm>
 //save data
 #include <fstream>
-#include "json.hpp"
 
 #define ANSI_CLEAR "\x1B[2J\x1B[H"  //clear terminal
 #define COLOR_RED   "\x1B[91m"
@@ -15,14 +14,13 @@
 #define COLOR_PURPLE "\x1B[35m"
 #define ANSI_COLOR_RESET "\x1B[m"  //reset colors
 
-using json = nlohmann::json;
 
-class Window {
+class window {
 public:
     /*
      * window constructor
      */
-    explicit Window(std::ostream &outputStream);
+    explicit window(std::ostream &outputStream);
     /*
      *  print displayed grid to console
      *  is loaded - if it is false, will be printed init text
@@ -57,14 +55,18 @@ public:
      */
     void init_copy_grid();
     /*
-     * save to JSON file both grids: original and displayed
+     * save to .txt file original grid
      */
-    void save_game(const std::string& file_name);
-
+    void save_grid(const std::string& file_name);
+    /*
+     * save to .txt file original grid
+     */
+    void save_copy(const std::string& file_name);
     /*
      * load grids data from json file "grids.json"
      */
-    void load_json();
+    void load_txt();
+
     //getters and setters
 
     const std::vector<std::pair<size_t, size_t>>& get_coords() const;

@@ -1,12 +1,12 @@
-#include "Window.h"
+#include "window.hpp"
 
 
-Window::Window(std::ostream &outputStream) :
+window::window(std::ostream &outputStream) :
         output_stream(outputStream)
 //        start(std::chrono::high_resolution_clock::now())
     {}
 
-void Window::refresh_text(bool& is_loaded) {
+void window::refresh_text(bool& is_loaded) {
     std::stringstream ss;
     if (!is_loaded) {
         ss << "You have saved progress. Do you want to continue? y/n: ";
@@ -44,7 +44,7 @@ void Window::refresh_text(bool& is_loaded) {
 }
 
 
-void Window::print_grid(bool& is_loaded) {
+void window::print_grid(bool& is_loaded) {
     std::stringstream buffer;
     if (is_loaded) {
         buffer << ANSI_CLEAR << ANSI_COLOR_RESET;
@@ -88,7 +88,7 @@ void Window::print_grid(bool& is_loaded) {
     output_stream << buffer.str() << std::endl;
 }
 
-void Window::init_grid() {
+void window::init_grid() {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             grid[i][j] = '0';
@@ -96,14 +96,14 @@ void Window::init_grid() {
     }
 }
 
-void Window::init_copy_grid() {
+void window::init_copy_grid() {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             copy[i][j] = '0';
         }
     }
 }
-void Window::init_bombs() {
+void window::init_bombs() {
     // Seed the random number generator with the current time
     std::srand(std::time(nullptr));
     int count = 0;
@@ -116,7 +116,7 @@ void Window::init_bombs() {
         }
     }
 }
-void Window::calculate_bombs_near() {
+void window::calculate_bombs_near() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             if (grid[y][x] == 'X') {
@@ -145,13 +145,13 @@ void Window::calculate_bombs_near() {
     }
 }
 
-void Window::original_grid() {
+void window::original_grid() {
     init_grid();
     init_bombs();
     calculate_bombs_near();
 }
 
-bool Window::already_entered(std::pair<size_t, size_t>& point) {
+bool window::already_entered(std::pair<size_t, size_t>& point) {
     bool already= false;
     for (auto& p : coords) {
         if (p.first == point.first && p.second == point.second) {
@@ -160,7 +160,7 @@ bool Window::already_entered(std::pair<size_t, size_t>& point) {
     }
     return already;
 }
-void Window::add_coordinates(size_t coord1, size_t coord2) {
+void window::add_coordinates(size_t coord1, size_t coord2) {
     auto coord_pair = std::make_pair(coord1, coord2);
     //TO-DO filter added points
     //if already been entered
@@ -177,7 +177,7 @@ void Window::add_coordinates(size_t coord1, size_t coord2) {
     }
 }
 
-void Window::calculate_grid(int y, int x) {
+void window::calculate_grid(int y, int x) {
 
     auto point = std::make_pair(static_cast<size_t>(y - 1), static_cast<size_t>(x - 1));//first - w; second - h
     switch (grid[y - 1][x - 1]) {
@@ -193,7 +193,7 @@ void Window::calculate_grid(int y, int x) {
     }
 }
 
-bool Window::already_marked(std::pair<size_t, size_t>& point) {
+bool window::already_marked(std::pair<size_t, size_t>& point) {
     bool is_marked = false;
     for (auto& p : marked_coords) {
         if (p.first == point.first && p.second == point.second) {
@@ -203,7 +203,7 @@ bool Window::already_marked(std::pair<size_t, size_t>& point) {
     return is_marked;
 }
 
-void Window::remove_flag(std::pair<size_t, size_t>& point) {
+void window::remove_flag(std::pair<size_t, size_t>& point) {
     //remove point from marked_coords vector
     auto newEnd = std::remove(marked_coords.begin(), marked_coords.end(), point);
     marked_coords.erase(newEnd, marked_coords.end());
@@ -211,7 +211,7 @@ void Window::remove_flag(std::pair<size_t, size_t>& point) {
     copy[point.first - 1][point.second - 1] = '0';
 }
 
-void Window::calculate_marked_coordinates(size_t coord1, size_t coord2) {
+void window::calculate_marked_coordinates(size_t coord1, size_t coord2) {
     auto marked_coord_pair = std::make_pair(coord1, coord2);
     if (copy[coord1 - 1][coord2 - 1] == '0' || copy[coord1 - 1][coord2 - 1] == 'F') {
         if (already_marked(marked_coord_pair)) {
@@ -233,7 +233,7 @@ void Window::calculate_marked_coordinates(size_t coord1, size_t coord2) {
 }
 
 
-void Window::open_one_cell_around(std::pair<size_t, size_t>& point) {
+void window::open_one_cell_around(std::pair<size_t, size_t>& point) {
     for (int dy = -1; dy <= 1; dy++) {
         for (int dx = -1; dx <= 1; dx++) {
             int newX = static_cast<int>(point.second) - 1 + dx;
@@ -258,7 +258,7 @@ void Window::open_one_cell_around(std::pair<size_t, size_t>& point) {
     }
 }
 
-bool Window::is_visited(std::pair<size_t, size_t> point) {
+bool window::is_visited(std::pair<size_t, size_t> point) {
     bool isVisited = false;
     for (auto& p : visited) {
         if (p.first == point.first && p.second == point.second) {
@@ -268,92 +268,91 @@ bool Window::is_visited(std::pair<size_t, size_t> point) {
     return isVisited;
 }
 
-void Window::open_number(std::pair<size_t, size_t>& point) {
+void window::open_number(std::pair<size_t, size_t>& point) {
     copy[point.first][point.second] = grid[point.first][point.second];
 }
 
-bool Window::is_lost() const {
+bool window::is_lost() const {
     return defeat;
 }
 
-const std::vector<std::pair<size_t, size_t>> &Window::get_coords() const {
+const std::vector<std::pair<size_t, size_t>> &window::get_coords() const {
     return coords;
 }
 
-bool Window::is_flag_mode() const {
+bool window::is_flag_mode() const {
     return flag_mode;
 }
 
-void Window::set_flag_mode(bool mode) {
+void window::set_flag_mode(bool mode) {
     flag_mode = mode;
 }
 
-bool Window::is_game_won() const {
+bool window::is_game_won() const {
     return victory;
 }
 
-const std::vector<std::pair<size_t, size_t>> &Window::get_marked_coords() const {
+const std::vector<std::pair<size_t, size_t>> &window::get_marked_coords() const {
     return marked_coords;
 }
 
-void Window::save_game(const std::string& file_name) {
-    // Create a JSON object to hold the arrays
-    json data;
-
-    // Add the original grid to the JSON object
-    json grid_data;
-    for (int i = 0; i < height; ++i) {
-        json row;
-        for (int j = 0; j < width; ++j) {
-            row.push_back(grid[i][j]);
-        }
-        grid_data.push_back(row);
-    }
-    data["grid"] = grid_data;
-
-    // Add the displayed grid to the JSON object
-    json copy_data;
-    for (int i = 0; i < height; ++i) {
-        json row;
-        for (int j = 0; j < width; ++j) {
-            row.push_back(copy[i][j]);
-        }
-        copy_data.push_back(row);
-    }
-    data["copy"] = copy_data;
-
-    // Save the JSON object to a JSON file and if it exists, it will be overriden
-    std::ofstream file(file_name, std::ios::out);
-    file << data.dump(4); // The "4" is for pretty-printing
-    file.close();
-}
-
-void Window::load_json() {
-    std::ifstream file("grids.json");
-    json jsonData;
+void window::save_grid(const std::string& file_name) {
+    std::ofstream file(file_name);
 
     if (file.is_open()) {
-        file >> jsonData;
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                file << grid[i][j];
+            }
+            file << '\n'; // Start a new line for each row
+        }
         file.close();
     } else {
-//                std::cerr << "Failed to open the JSON file." << std::endl;
-        return;
+        std::cerr << "Unable to open the file for writing." << std::endl;
+    }
+}
+
+void window::save_copy(const std::string& file_name) {
+    std::ofstream file(file_name);
+
+    if (file.is_open()) {
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                file << copy[i][j];
+            }
+            file << '\n'; // Start a new line for each row
+        }
+        file.close();
+    } else {
+        std::cerr << "Unable to open the file for writing." << std::endl;
+    }
+}
+
+void window::load_txt() {
+    std::ifstream grid_file("grid.txt");
+    if (grid_file.is_open()) {
+        for (int i = 0; i < height; i++) {
+            std::string line;
+            if (std::getline(grid_file, line)) {
+                for (int j = 0; j < width; j++) {
+                    grid[i][j] = line[j];
+                }
+            }
+        }
+        grid_file.close();
     }
 
-    //get original grid
-    json grid_json = jsonData["grid"];
-    for (int i = 0; i < 9; ++i) {
-        for (int j = 0; j < 9; ++j) {
-            grid[i][j] = static_cast<char>(grid_json[i][j].get<size_t>());
+    std::ifstream copy_file("copy.txt");
+    if (copy_file.is_open()) {
+        for (int i = 0; i < height; i++) {
+            std::string line;
+            if (std::getline(copy_file, line)) {
+                for (int j = 0; j < width; j++) {
+                    copy[i][j] = line[j];
+                }
+            }
         }
-    }
-
-    //get displayed grid
-    json copy_json = jsonData["copy"];
-    for (int i = 0; i < 9; ++i) {
-        for (int j = 0; j < 9; ++j) {
-            copy[i][j] = static_cast<char>(copy_json[i][j].get<size_t>());
-        }
+        copy_file.close();
     }
 }
 
