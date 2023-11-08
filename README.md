@@ -14,10 +14,37 @@ cmake -Bcmake-build-debug -H. -DCMAKE_BUILD_TYPE=Debug
 cmake --build cmake-build-debug
 ```
 
-Příklady spuštění programu:
+## Příklady spuštění programu
+### Spustit hru
 ```bash
 ./cmake-build-debug/Minesweeper
 ```
+### Podívat se na nápovědy a na pravidla hry
+```bash
+./cmake-build-debug/Minesweeper --help
+```
+Zde bude hráč dotázán, zda zahájit hru nebo opustit manuál:
+```
+Welcome to HELP page of the game Minesweeper!
+
+Game tips:
+1.How to enter coordinates of the point?
+[row] [col]
+2.How to switch mode to flag mode?
+Enter 'f' from the keyboard
+3.How to remove flag from the grid?
+Enter coordinates of the point that you want to remove in flag mode from the keyboard
+4.How to save game process
+Enter 's' from the keyboard
+5.How to quit the game?
+Enter 'q' from the keyboard
+
+Game rules:
+You need to correctly mark all bombs by flags.
+If you select in non-flag mode coordinates that is bomb, you will lost
+Type 'start' to start game or 'exit' to exit: 
+```
+
 
 ## Ovládání programu
 
@@ -47,11 +74,11 @@ které odpovidají bombě, totiž prohraje.
 
 Program je možné kdykoliv ukončit klávesou `q`.
 
-## Testování programu
+## Manual: how to play
 
 ### POZOR! 
-Jelikož bobmy se generujou náhodně, testy jsou jenom ukázka možných variant
-rozvoje hry. Presně zopakovat běh těchto testů není možné.
+Jelikož bobmy se generujou náhodně, manual je jenom ukázka možných variant
+rozvoje hry. Presně zopakovat běh manualu není možné.
 
 ### Prohra
 
@@ -227,6 +254,199 @@ Hláška `You won!` označuje výhru
 -------------------------------------
 You won!
 ```
+
+## Testování prográmu
+### Výhra
+1. Vytvořit ve složce `cmake-build-debug` dva .txt soubory: `grid.txt` a `copy.txt`.
+2. Přidat do souboru `grid.txt` dálší hodnoty:
+```
+   1X22XX1  
+   12X2221  
+   111
+
+1221     
+1XX1   11
+1221   1X
+111 11
+1X1
+```
+3. Přidat do souboru `copy.txt` dálší hodnoty:
+```
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+```
+4. Spustit program a zmačknout tlačitko `y`.
+5. Zadat souřadnice `1 1`:
+```
+-------------------------------------
+| 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+Entered coords: 1 1
+```
+6. Zadat souřadnice `9 9`:
+```
+-------------------------------------
+| 1 | 0 | 0 | 0 | 0 | 0 | 1 |   |   |
+-------------------------------------
+| 1 | 2 | 0 | 2 | 2 | 2 | 1 |   |   |
+-------------------------------------
+|   | 1 | 1 | 1 |   |   |   |   |   |
+-------------------------------------
+|   |   |   |   |   |   |   |   |   |
+-------------------------------------
+| 1 | 2 | 2 | 1 |   |   |   |   |   |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 1 | 1 | 1 |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 1 |   |   |   |
+-------------------------------------
+Entered coords: 9 9
+```
+7. Přepnout do režimu praporu zmačknutím tlačitka `f`:
+```
+-------------------------------------
+| 1 | 0 | 0 | 0 | 0 | 0 | 1 |   |   |
+-------------------------------------
+| 1 | 2 | 0 | 2 | 2 | 2 | 1 |   |   |
+-------------------------------------
+|   | 1 | 1 | 1 |   |   |   |   |   |
+-------------------------------------
+|   |   |   |   |   |   |   |   |   |
+-------------------------------------
+| 1 | 2 | 2 | 1 |   |   |   |   |   |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 1 | 1 | 1 |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 1 |   |   |   |
+-------------------------------------
+You are in flag mode! Entered coords in flag mode: 
+```
+8. Přidat prapor do buňky s souřadnicemi `7 9`:
+```
+-------------------------------------
+| 1 | 0 | 0 | 0 | 0 | 0 | 1 |   |   |
+-------------------------------------
+| 1 | 2 | 0 | 2 | 2 | 2 | 1 |   |   |
+-------------------------------------
+|   | 1 | 1 | 1 |   |   |   |   |   |
+-------------------------------------
+|   |   |   |   |   |   |   |   |   |
+-------------------------------------
+| 1 | 2 | 2 | 1 |   |   |   |   |   |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | F |
+-------------------------------------
+| 0 | 0 | 0 | 1 | 1 | 1 |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 1 |   |   |   |
+-------------------------------------
+You are in flag mode! Entered coords in flag mode: 7 9
+```
+9. Přidat dálší prapory, tak aby hra byla vyhrána:
+```
+-------------------------------------
+| 1 | 2 | F | 2 | 2 | 2 | 1 |   |   |
+-------------------------------------
+|   | 1 | 1 | 1 |   |   |   |   |   |
+-------------------------------------
+|   |   |   |   |   |   |   |   |   |
+-------------------------------------
+| 1 | 2 | 2 | 1 |   |   |   |   |   |
+-------------------------------------
+| 0 | F | F | 1 |   |   |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 1 |   |   |   | 1 | F |
+-------------------------------------
+| 0 | 0 | 0 | 1 | 1 | 1 |   | 1 | 1 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | F | 1 |   |   |   |
+-------------------------------------
+You won!
+```
+10. Soubory `grid.txt` a `copy.txt` byly smazany ze složky `cmake-build-debug`
+
+### Prohra
+1. Vytvořit ve složce `cmake-build-debug` dva .txt soubory: `grid.txt` a `copy.txt`.
+2. Přidat do souboru `grid.txt` dálší hodnoty:
+```
+   111   
+   1X1111
+   1122X1
+11   1X21
+X1   111 
+1112321  
+  1XXX1  
+ 123321  
+ 1X1     
+```
+3. Přidat do souboru `copy.txt` dálší hodnoty:
+```
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+```
+4. Spustit program a zmačknout tlačitko `y`.
+5. Zadat souřadnice `9 3` a prohrát:
+```
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+-------------------------------------
+You lost!
+```
+6. Soubory `grid.txt` a `copy.txt` byly smazany ze složky `cmake-build-debug`
 
 
 

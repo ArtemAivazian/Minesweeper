@@ -3,7 +3,6 @@
 
 window::window(std::ostream &outputStream) :
         output_stream(outputStream)
-//        start(std::chrono::high_resolution_clock::now())
     {}
 
 void window::refresh_text(bool& is_loaded) {
@@ -12,9 +11,6 @@ void window::refresh_text(bool& is_loaded) {
         ss << "You have saved progress. Do you want to continue? y/n: ";
     } else {
             if (victory) {
-//        end = std::chrono::high_resolution_clock::now();
-//        duration = end - start;
-//        ss << "You won! Your time: " << duration.count();
                 ss << "You won!";
             } else if (flag_mode) {
                 ss << "You are in flag mode!" << " ";
@@ -26,9 +22,6 @@ void window::refresh_text(bool& is_loaded) {
                         ss << get_marked_coords().back().second;
                 }
             } else if (defeat) {
-//        end = std::chrono::high_resolution_clock::now();
-//        duration = end - start;
-//        ss << "You lost! Your time: " << duration.count();
                 ss << "You lost!";
             } else {
                 ss << "Entered coords: ";
@@ -162,7 +155,6 @@ bool window::already_entered(std::pair<size_t, size_t>& point) {
 }
 void window::add_coordinates(size_t coord1, size_t coord2) {
     auto coord_pair = std::make_pair(coord1, coord2);
-    //TO-DO filter added points
     //if already been entered
     //no ' ' and number
     if (!already_entered(coord_pair)) {
@@ -258,44 +250,6 @@ void window::open_one_cell_around(std::pair<size_t, size_t>& point) {
     }
 }
 
-bool window::is_visited(std::pair<size_t, size_t> point) {
-    bool isVisited = false;
-    for (auto& p : visited) {
-        if (p.first == point.first && p.second == point.second) {
-            isVisited = true;
-        }
-    }
-    return isVisited;
-}
-
-void window::open_number(std::pair<size_t, size_t>& point) {
-    copy[point.first][point.second] = grid[point.first][point.second];
-}
-
-bool window::is_lost() const {
-    return defeat;
-}
-
-const std::vector<std::pair<size_t, size_t>> &window::get_coords() const {
-    return coords;
-}
-
-bool window::is_flag_mode() const {
-    return flag_mode;
-}
-
-void window::set_flag_mode(bool mode) {
-    flag_mode = mode;
-}
-
-bool window::is_game_won() const {
-    return victory;
-}
-
-const std::vector<std::pair<size_t, size_t>> &window::get_marked_coords() const {
-    return marked_coords;
-}
-
 void window::save_grid(const std::string& file_name) {
     std::ofstream file(file_name);
 
@@ -355,6 +309,45 @@ void window::load_txt() {
         copy_file.close();
     }
 }
+
+bool window::is_visited(std::pair<size_t, size_t> point) {
+    bool isVisited = false;
+    for (auto& p : visited) {
+        if (p.first == point.first && p.second == point.second) {
+            isVisited = true;
+        }
+    }
+    return isVisited;
+}
+
+void window::open_number(std::pair<size_t, size_t>& point) {
+    copy[point.first][point.second] = grid[point.first][point.second];
+}
+
+bool window::is_lost() const {
+    return defeat;
+}
+
+const std::vector<std::pair<size_t, size_t>> &window::get_coords() const {
+    return coords;
+}
+
+bool window::is_flag_mode() const {
+    return flag_mode;
+}
+
+void window::set_flag_mode(bool mode) {
+    flag_mode = mode;
+}
+
+bool window::is_game_won() const {
+    return victory;
+}
+
+const std::vector<std::pair<size_t, size_t>> &window::get_marked_coords() const {
+    return marked_coords;
+}
+
 
 
 
