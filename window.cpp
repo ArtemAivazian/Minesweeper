@@ -63,7 +63,7 @@ void window::print_grid(bool& is_loaded) {
                         buffer << COLOR_PURPLE << copy[j][i] << ANSI_COLOR_RESET;
                         break;
                     default:
-                        buffer << copy[j][i];
+                        buffer << ((copy[j][i] == 'P') ? ' ' : copy[j][i]);
                         break;
                 }
                 buffer << " ";
@@ -133,7 +133,7 @@ void window::calculate_bombs_near() {
                     }
                 }
             }
-            grid[y][x] = (countBombs == 0) ? ' ' : ('0' + countBombs);
+            grid[y][x] = (countBombs == 0) ? 'P' : ('0' + countBombs);
         }
     }
 }
@@ -173,7 +173,7 @@ void window::calculate_grid(int y, int x) {
 
     auto point = std::make_pair(static_cast<size_t>(y - 1), static_cast<size_t>(x - 1));//first - w; second - h
     switch (grid[y - 1][x - 1]) {
-        case ' ':
+        case 'P':
             open_one_cell_around(point);
             break;
         case 'X':
@@ -240,7 +240,7 @@ void window::open_one_cell_around(std::pair<size_t, size_t>& point) {
             {
                 visited.push_back(p);
                 copy[newY][newX] = grid[newY][newX];
-                if (grid[newY][newX] != 'X' && grid[newY][newX] != ' ')
+                if (grid[newY][newX] != 'X' && grid[newY][newX] != 'P')
                     continue;
                 newX++; newY++;
                 auto newPoint = std::make_pair(static_cast<size_t>(newY), static_cast<size_t>(newX));

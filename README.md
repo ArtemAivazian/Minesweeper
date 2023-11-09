@@ -260,15 +260,16 @@ You won!
 1. Vytvořit ve složce `cmake-build-debug` dva .txt soubory: `grid.txt` a `copy.txt`.
 2. Přidat do souboru `grid.txt` dálší hodnoty:
 ```
-   1X22XX1  
-   12X2221  
-   111
+22211PP11
+XX2X1PP2X
+222221P2X
+PPP1X1P11
+PPP111PPP
+PPPPPPPPP
+PPPPP111P
+P111P1X1P
+P1X1P111P
 
-1221     
-1XX1   11
-1221   1X
-111 11
-1X1
 ```
 3. Přidat do souboru `copy.txt` dálší hodnoty:
 ```
@@ -401,16 +402,7 @@ You won!
 ### Prohra
 1. Vytvořit ve složce `cmake-build-debug` dva .txt soubory: `grid.txt` a `copy.txt`.
 2. Přidat do souboru `grid.txt` dálší hodnoty:
-```
-   111   
-   1X1111
-   1122X1
-11   1X21
-X1   111 
-1112321  
-  1XXX1  
- 123321  
- 1X1     
+``` 
 ```
 3. Přidat do souboru `copy.txt` dálší hodnoty:
 ```

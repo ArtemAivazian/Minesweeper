@@ -6,6 +6,7 @@
 #include <algorithm>
 //save data
 #include <fstream>
+#include <ctime>
 
 #define ANSI_CLEAR "\x1B[2J\x1B[H"  //clear terminal
 #define COLOR_RED   "\x1B[91m"
